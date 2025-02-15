@@ -1,4 +1,3 @@
-
 import { create } from 'zustand'
 import { auth } from '@/lib/auth'
 import type { User } from '@supabase/supabase-js'
