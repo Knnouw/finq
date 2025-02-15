@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -9,6 +10,7 @@ import { Expenses } from "@/pages/Expenses";
 import { Investments } from "@/pages/Investments";
 import { Installments } from "@/pages/Installments";
 import { Settings } from "@/pages/Settings";
+import { Plans } from "@/pages/Plans";
 import { NotFound } from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +23,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/signup" element={<SignUpForm />} />
+          <Route path="/plans" element={<Plans />} />
           <Route
             path="/dashboard/*"
             element={

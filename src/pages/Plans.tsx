@@ -1,4 +1,5 @@
 
+
 import { PricingPlans } from '@/components/subscription/PricingPlans'
 
 export function Plans() {
@@ -10,3 +11,4 @@ export function Plans() {
 }
 
 export default Plans
+
