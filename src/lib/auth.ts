@@ -1,3 +1,4 @@
+
 import { supabase } from './supabase'
 import { type AuthError, type User } from '@supabase/supabase-js'
 
@@ -32,25 +33,28 @@ export const auth = {
 
         if (profileError) {
           console.error('Error creating user profile:', profileError);
-          return { user: null, error: { 
-            status: 500, 
+          const error: AuthError = {
+            name: 'ProfileCreationError',
             message: 'Error creating user profile',
+            status: 500,
+            code: 'PROFILE_CREATION_ERROR',
             __isAuthError: true
-          } as AuthError };
+          };
+          return { user: null, error };
         }
       }
 
       return { user, error: authError };
     } catch (error) {
       console.error('Signup error:', error);
-      return { 
-        user: null, 
-        error: { 
-          status: 500, 
-          message: 'An unexpected error occurred',
-          __isAuthError: true
-        } as AuthError 
+      const authError: AuthError = {
+        name: 'UnexpectedError',
+        message: 'An unexpected error occurred',
+        status: 500,
+        code: 'UNEXPECTED_ERROR',
+        __isAuthError: true
       };
+      return { user: null, error: authError };
     }
   },
 
