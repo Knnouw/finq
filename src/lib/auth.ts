@@ -7,40 +7,53 @@ export type AuthResponse = {
 }
 
 export const auth = {
-  // Registrar novo usuário
   signUp: async (email: string, password: string, fullName: string): Promise<AuthResponse> => {
-    const { data: { user }, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
-
-    if (user) {
-      // Criar registro na tabela users
-      const { error: profileError } = await supabase
-        .from('users')
-        .insert([
-          {
-            user_id: user.id,
-            email: email,
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
             full_name: fullName,
           },
-        ]);
+        },
+      });
 
-      if (profileError) {
-        console.error('Error creating user profile:', profileError);
-        return { user: null, error: profileError };
+      if (user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([
+            {
+              user_id: user.id,
+              email: email,
+              full_name: fullName,
+            },
+          ]);
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          return { user: null, error: { 
+            status: 500, 
+            message: 'Error creating user profile',
+            __isAuthError: true
+          } as AuthError };
+        }
       }
-    }
 
-    return { user, error };
+      return { user, error: authError };
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { 
+        user: null, 
+        error: { 
+          status: 500, 
+          message: 'An unexpected error occurred',
+          __isAuthError: true
+        } as AuthError 
+      };
+    }
   },
 
-  // Login com email/senha
   signIn: async (email: string, password: string): Promise<AuthResponse> => {
     const { data: { user }, error } = await supabase.auth.signInWithPassword({
       email,
@@ -49,13 +62,11 @@ export const auth = {
     return { user, error };
   },
 
-  // Logout
   signOut: async () => {
     const { error } = await supabase.auth.signOut();
     return { error };
   },
 
-  // Recuperar senha
   resetPassword: async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
@@ -63,13 +74,11 @@ export const auth = {
     return { error };
   },
 
-  // Obter usuário atual
   getCurrentUser: async (): Promise<AuthResponse> => {
     const { data: { user }, error } = await supabase.auth.getUser();
     return { user, error };
   },
 
-  // Verificar sessão
   onAuthStateChange: (callback: (user: User | null) => void) => {
     supabase.auth.onAuthStateChange((event, session) => {
       callback(session?.user || null);
